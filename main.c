@@ -2,12 +2,13 @@
 #include <string.h>
 #include <stdlib.h>
 #define MAXSIZE 50 //MAXIMUM SIZE OF INPUT
+#define MAXBUFFFERSIZE 1024 //MAXIMUM SIZE OF BUFFER FOR READ
 
 typedef struct management //STRUCT FOR MANAGE ALL ELEMENTS/ROWS
 {
     unsigned int elementcount; //ELEMENTCOUNTER IS THE NUMBER OF ALL ELEMENTS/ROWS IN STORAGE
     struct row* first; //POSITION OF THE FIRST ELEMENT/ROW IN STORAGE
-} mangement_struct;
+} management_struct;
 
 typedef struct row //STRUCT FOR ONE ELEMENT/ROW
 {
@@ -18,34 +19,35 @@ typedef struct row //STRUCT FOR ONE ELEMENT/ROW
     char sensitive2[MAXSIZE]; //SENSITIVE (JOB)
     char sensitive3[MAXSIZE]; //SENSITIVE (MONEY)
     struct row *next; //POSITION OF THE NEXT ELEMENT/ROW IN STORAGE
-} row_element;
+} row_struct;
 
-int init_management_struct(mangement_struct* row)  //INIT MANAGEMENT STRUCT
+int initManagementRow(management_struct *managementrow)  //INIT MANAGEMENT STRUCT
 {
-    if(row == NULL) {	//CHECK IF STRUCT IS NULL
+    if(managementrow == NULL) {	//CHECK IF STRUCT IS NULL
         return -1;
     }
 
-    row->elementcount = 0; //SET ELEMENT COUNTER TO 0; BECAUSE NO DATA/ROWS ARE IN STORAGE
-    row->first =  NULL; //SET FIRST ELEMENT TO NULL; BECAUSE NO DATA/ROWS ARE IN STORAGE
+    managementrow->elementcount = 0; //SET ELEMENT COUNTER TO 0; BECAUSE NO DATA/ROWS ARE IN STORAGE
+    managementrow->first =  NULL; //SET FIRST ELEMENT TO NULL; BECAUSE NO DATA/ROWS ARE IN STORAGE
 
     return 0;
 }
 
-int addNewRow(mangement_struct *managmentrow, int qi1, char *qi2, char *qi3, char *sensitive1, char *sensitive2, char *sensitive3) //ADD A NEW ELEMENT/ROW TO STORAGE
+int addNewRow(management_struct *managementrow, int qi1, char *qi2, char *qi3, char *sensitive1, char *sensitive2, char *sensitive3) //ADD A NEW ELEMENT/ROW TO STORAGE
 {
-    if( qi1 == NULL ) { //CHECK IF QI1 IS NULL
+    if(managementrow == NULL) {	//CHECK IF STRUCT IS NULL
+        return -1;
+    }
+
+
+    if(qi1 == 0) { //CHECK IF QI1 IS NULL
         return -1;
     }
 
     struct row *nextrow = NULL; //CREATE A NEW STRUCT OF TYP ROW
     //printf("in add\n");
 
-    if( managmentrow == NULL ) { //CHECK IF MANAGEMENTROW IS NULL
-        return -1;
-    }
-
-    nextrow = malloc( sizeof(row_element) ); //ALLOCATE MEMORY FOR NEW STRUCT
+    nextrow = malloc( sizeof(row_struct) ); //ALLOCATE MEMORY FOR NEW STRUCT
     if( nextrow == NULL ) { //CHECK IF NEXTROW IS NULL
         return -1;
     }
@@ -81,18 +83,24 @@ int addNewRow(mangement_struct *managmentrow, int qi1, char *qi2, char *qi3, cha
         return -1;
     }
 
-    nextrow->next = managmentrow->first; //SET POSITION OF LAST ELEMENT/ROW IN MANAGEMENTROW AS NEXT ELEMENT/ROW IN THE NEW STRUCT
-    managmentrow->first = nextrow; //SET POSITION OF THE NEW STRUCT AS FIRST ELEMENT/ROW IN MANAGEMENTROW
+    nextrow->next = managementrow->first; //SET POSITION OF LAST ELEMENT/ROW IN MANAGEMENTROW AS NEXT ELEMENT/ROW IN THE NEW STRUCT
+    managementrow->first = nextrow; //SET POSITION OF THE NEW STRUCT AS FIRST ELEMENT/ROW IN MANAGEMENTROW
 
-    managmentrow->elementcount++; //INCREASE ELEMENT COUNTER BY 1
+    managementrow->elementcount++; //INCREASE ELEMENT COUNTER BY 1
 
     return 1;
 }
 
-void makeKanonymity(const mangement_struct *managementrow, int k) //MAKE K-ANONYMITIY
+int makeKanonymity(const management_struct *managementrow, int k) //MAKE K-ANONYMITIY
 {
     int i; //VARIABLE FOR FOR-LOOP
-    row_element* currentrow = managementrow->first; //STORE FIRST STRUCT IN THIS CURRENT STRUCT
+
+    if(managementrow == NULL) {	//CHECK IF STRUCT IS NULL
+        return -1;
+    }
+
+
+    row_struct* currentrow = managementrow->first; //STORE FIRST STRUCT IN THIS CURRENT STRUCT
 
     printf("make k = %d:\n", k);
 
@@ -225,14 +233,14 @@ void makeKanonymity(const mangement_struct *managementrow, int k) //MAKE K-ANONY
     //QUASI-IDENTIFIER QI3 DATE
         char *store[MAXSIZE] = {NULL}; //ARRAY FOR STORE THE STRING PARTS
         char *part = 0; //POINTER FOR CURRENT POSITION IN STRING
-        int i = 0; //COUNTER FOR INCREASE ARRAY
+        int j = 0; //COUNTER FOR INCREASE ARRAY
 
         part = strtok(currentrow->qi3, ". "); //START POSITION BY FIRST DELIMITER OF STRING
         while (part)
         {
-            store[i] = part; //STORE PARTS OF THE STRING IN ARRAY
+            store[j] = part; //STORE PARTS OF THE STRING IN ARRAY
             part = strtok(NULL, ". "); //GO TO NEXT POSITION OF DELIMITER IN THE STRING
-            i++; //INCREASE COUNTER BY 1
+            j++; //INCREASE COUNTER BY 1
         }
 
         strcpy(currentrow->qi3, store[1]); //REPLACE/COPY DATE TO MONTH
@@ -260,50 +268,147 @@ void makeKanonymity(const mangement_struct *managementrow, int k) //MAKE K-ANONY
 
         currentrow = currentrow->next; //GET NEXT STRUCT (=ROW OF THE DATAFILE) AND STORE IT IN CURRENT STRUCT
     }
+
+    return 1;
 }
 
-void printRow(const mangement_struct *mangementrow, int number) //PRINT OUT A ROW BY NUMBER
+int freeAllRows(management_struct *managementrow) //FREE MEMORY BY DELETE ALL ELEMENTS/ROWS IN STORAGE
 {
-    int i; //VARIABLE FOR FOR-LOOP
-    int existrow = 0;
-    row_element* currentrow = mangementrow->first; //STORAGE FOR CURRENT ELEMENT/ROW AND FOR INIT STORE THE FIRST ELEMENT OF MANAGEMENT STRUCT IN IT
+    if(managementrow == NULL) {	//CHECK IF STRUCT IS NULL
+        return -1;
+    }
 
-    if (mangementrow->elementcount <= number) //CHECK IF NO ELEMENT/ROW IS IN STORAGE = CASE IF NUMBER IS
+    row_struct* freeelement = managementrow->first; //CREATE A STRUCT FOR STORE THE CURRENT ELEMENT/ROW FOR DELETE THE ELEMENT/ROW AND STORE THE FIRST ELEMENT/ROW TO DELETE IN IT
+    row_struct* next; //CREAT A STRUCT FOR STORE THE NEXT ELEMENT/ROW IN IT
+
+    while (freeelement != NULL) //DELETE ALL ELEMENTS/ROWS
+    {
+        next = freeelement->next; //STORE THE NEXT ELEMENT/ROW IN THE STRUCT NEXT
+        free(freeelement); //FEE THE MEMORY AND DELETE THE CURRENT ELEMENT/ROW
+        freeelement = next; //STORE THE NEXT ELEMENT/ROW AS THE CURRENT ELEMENT/ROW TO FREE IT
+    }
+    managementrow->elementcount = 0; //FINALLY SET THE COUNTER OF ELEMENTS/ROWS TO 0
+
+    return 1;
+}
+
+int printRow(const management_struct *managementrow, int number) //PRINT OUT A ROW BY NUMBER
+{
+    if(managementrow == NULL) {	//CHECK IF STRUCT IS NULL
+        return -1;
+    }
+
+    int i; //VARIABLE FOR FOR-LOOP
+    row_struct* currentrow = managementrow->first; //STORAGE FOR CURRENT ELEMENT/ROW AND FOR INIT STORE THE FIRST ELEMENT OF MANAGEMENT STRUCT IN IT
+
+    if (managementrow->elementcount <= number) //CHECK IF NO ELEMENT/ROW IS IN STORAGE = CASE IF NUMBER IS
     {
         printf("Sorry no Row\n");
     }
-    
+
     printf("printRow with Number %d:\n", number);
-    for(i = 0; i < mangementrow->elementcount; i++) {  //GET ALL ELEMENTS/ROWS
+    for(i = 0; i < managementrow->elementcount; i++) {  //GET ALL ELEMENTS/ROWS
 
         if(i == number) //PRINT OUT DATA OF CURRENT ELEMENT/ROW
         {
             printf("ELEMENT [%d]: %d, %s, %s, %s, %s, %s \n", i, currentrow->qi1, currentrow->qi2, currentrow->qi3, currentrow->sensitive1, currentrow->sensitive2, currentrow->sensitive3); //PRINT OUT DATA OF CURRENT ELEMENT/ROW
-            existrow = 1; //IF ELEMENT/ROW IS IN DATA
         }
         currentrow = currentrow->next; //GET NEXT ELEMENT/ROW AND STORE IT IN CURRENT STRUCT
     }
+    return 1;
 }
 
-void printAllRows(const mangement_struct *managmentrow) //PRINT OUT ALL ROWS
+int printAllRows(const management_struct *managementrow) //PRINT OUT ALL ROWS
 {
+    if(managementrow == NULL) {	//CHECK IF STRUCT IS NULL
+        return -1;
+    }
+
     int i; //VARIABLE FOR FOR-LOOP
     printf("printAllRows\n");
-    row_element* currentrow = managmentrow->first; //STORAGE FOR CURRENT ELEMENT/ROW AND FOR INIT STORE THE FIRST ELEMENT OF MANAGEMENT STRUCT IN IT
+    row_struct* currentrow = managementrow->first; //STORAGE FOR CURRENT ELEMENT/ROW AND FOR INIT STORE THE FIRST ELEMENT OF MANAGEMENT STRUCT IN IT
 
-    for(i = 0; i < managmentrow->elementcount; i++) { //GET ALL ELEMENTS/ROWS
+    for(i = 0; i < managementrow->elementcount; i++) { //GET ALL ELEMENTS/ROWS
 
-        printf("ELEMENT [%d]: %d, %s, %s, %s, %s, %s \n", i, currentrow->qi1, currentrow->qi2, currentrow->qi3, currentrow->sensitive1, currentrow->sensitive2, currentrow->sensitive3); //PRINT OUT DATA OF CURRENT ELEMENT/ROW
+        printf("ELEMENT [%d]: %d, %s, %s, %s, %s, %s", i, currentrow->qi1, currentrow->qi2, currentrow->qi3, currentrow->sensitive1, currentrow->sensitive2, currentrow->sensitive3); //PRINT OUT DATA OF CURRENT ELEMENT/ROW
         currentrow = currentrow->next; //GET NEXT ELEMENT/ROW AND STORE IT IN CURRENT STRUCT
     }
+    return 1;
+}
+
+int readFromCSV (management_struct *managementrow, char *filename) //READ DATA FROM CSV-FILE
+{
+    if(managementrow == NULL) {	//CHECK IF STRUCT IS NULL
+        return -1;
+    }
+
+    FILE *inputfile = fopen(filename,"r"); //CREATE FILE AND OPEN FILE WITH READ MODE
+
+    if(inputfile == NULL)   { //CHECK IF INPUTFILE CANNOT OPENED
+        printf("ERROR: file opening failed. \n"); //ERROR MESSAGE
+        return -1 ;
+    }
+
+    printf("TEST Filename: %s\n", filename);
+
+    char buffer[MAXBUFFFERSIZE]; //CREATE A BUFFER FOR READ A ROW FROM INPUTFILE
+    char *store[MAXSIZE] = {NULL}; //CREATE ARRAY FOR STORE EVERY PART OF THE ROW
+    char *token = 0; //POINTER FOR CURRENT POSITION IN ROW
+
+    while (fgets(buffer, sizeof(buffer), inputfile)) //READS DATA FROM INPUTFILE INTRO THE BUFFER
+    {
+        int i = 0; //VARIABLE FOR POSITION IN ARRAY
+        token = strtok(buffer, ","); //STORE FIRST POSITION IN TOKEN - THE SEPARATOR IS THE COMMA
+        while (token)
+        {
+            store[i] = token; //STORE PART OF THE ROW IN THE ARRAY
+            printf("Abschnitt gefunden[%d]:%s\n", i,  store[i]);
+            token = strtok(NULL, ","); //STORE NEXT POSITION IN TOKEN - THE SEPARATOR IS THE COMMA
+            i++; //INCREASE COUNTER FOR NEXT POSITION IN ARRAY
+        }
+        addNewRow(managementrow, atoi(store[4]), store[3], store[7], store[5], store[6], store[8]); //CALL FUNCTION FOR ADD A NEW ROW IN STORAGE
+    }
+
+    fclose(inputfile); //CLOSE INPUTFILE
+
+    return 1;
+}
+
+int writeToCSV (management_struct *managementrow, char *filename) //WRITE DATA TO CSV-FILE
+{
+    if(managementrow == NULL) {	//CHECK IF STRUCT IS NULL
+        return -1;
+    }
+
+    FILE *outputfile = fopen(filename,"w"); //CREATE FILE AND OPEN FILE WITH WRITE MODE
+
+    if(outputfile == NULL)   { //CHECK IF OUTPUTFILE CANNOT OPENED
+        printf("ERROR: file opening failed. \n"); //ERROR MESSAGE
+        return -1 ;
+    }
+
+    printf("TEST: %s\n", filename);
+
+    int i; //VARIABLE FOR FOR-LOOP
+    row_struct* currentrow = managementrow->first; //STORAGE FOR CURRENT ELEMENT/ROW AND FOR INIT STORE THE FIRST ELEMENT OF MANAGEMENT STRUCT IN IT
+
+    fprintf(outputfile, "Age, Gender, Date, Region, Job Classification, Balance\n");
+    for(i = 0; i < managementrow->elementcount; i++) {  //GET ALL ELEMENTS/ROWS
+        fprintf(outputfile, "%d, %s, %s, %s, %s, %s", currentrow->qi1, currentrow->qi2, currentrow->qi3, currentrow->sensitive1, currentrow->sensitive2, currentrow->sensitive3); //WRITE ROW INTO OUTPUTFILE (ROW BY ROW)
+        currentrow = currentrow->next; //GET NEXT ELEMENT/ROW AND STORE IT IN CURRENT STRUCT
+    }
+
+    fclose(outputfile); //CLOSE OUTPUTFILE
+
+    return 1;
 }
 
 int main(int argc, char **argv)
 {
-    mangement_struct managmentrow; //STORAGE FOR MANAGEMENT OF ALL ELEMENTS/ROWS
-    init_management_struct(&managmentrow); //CALL FUNCTION TO INIT MANAGEMENT STRUCT
+    management_struct managementrow; //STORAGE FOR MANAGEMENT OF ALL ELEMENTS/ROWS
+    initManagementRow(&managementrow); //CALL FUNCTION TO INIT MANAGEMENT STRUCT
 
-    if(argc == NULL) //CHECK IF ARGC IS NULL
+    if(argc == 0) //CHECK IF ARGC IS NULL
     {
         fprintf(stderr, "ERROR 2: NULLPOINTER name in argc\n"); //ERROR MESSAGE
         return -1;
@@ -328,63 +433,16 @@ int main(int argc, char **argv)
     if((argc == 6) && (strcmp(argv[1], "–anonymize") == 0)) /* –anonymize 5 inputFile.csv outputFile.csv [debugfile.txt] */
     {
         printf("if 1\n");
-        char buffer[1024] ;
-        char delimiter[] = ",,;";
 
-        FILE *fstream = fopen( argv[3],"r");
-
-        if(fstream == NULL)   {
-            printf("\n file opening failed ");
-            return -1 ;
-        }
-
-
-        fgets(buffer, sizeof(buffer), fstream);
-        printf("BUFFER: %s\n", buffer);
-
-
-        char *store[MAXSIZE] = {NULL};
-        char *token = 0;
-        while (fgets(buffer, sizeof(buffer), fstream))
-        {
-            int i = 0;
-            token = strtok(buffer, ",");
-            while (token)
-            {
-                store[i] = token;
-                //printf("Abschnitt gefunden[%d]:%s\n", i,  store[i]);
-                token = strtok(NULL, ",");
-                i++;
-            }
-            addNewRow(&managmentrow, atoi(store[4]), store[3], store[7], store[5], store[6], store[8]); //AGE, NAME, DATE, Country,  Job, Money
-        }
-        /*
-
-             add_int(&managmentrow, 1, "ma", "dienstag", "april", "hans", "mayr");
-             add_int(&managmentrow, 2, "ma", "montag", "juni", "betty", "arik");
-             add_int(&managmentrow, 3, "ma", "montag", "juni", "betty", "arik");
-             add_int(&managmentrow, 4, "ma", "montag", "juni", "betty", "arik");
-             addNewRow(&managmentrow, 5, "ma", "montag", "juni", "betty", "arik");
-
-              *
-              * Abschnitt gefunden[0]:100001225
-     Abschnitt gefunden[1]:Connor
-     Abschnitt gefunden[2]:McLean
-     Abschnitt gefunden[3]:Male
-     Abschnitt gefunden[4]:34
-     Abschnitt gefunden[5]:England
-     Abschnitt gefunden[6]:White Collar
-     Abschnitt gefunden[7]:15.Jul.15
-     Abschnitt gefunden[8]:919.1
-
-              */
-        printRow(&managmentrow, 0);
-        printRow(&managmentrow, 4013);
-        makeKanonymity(&managmentrow, k);
-        printRow(&managmentrow, 0);
-        printRow(&managmentrow, 4013);
-        //printAllRows(&managmentrow);
-
+        readFromCSV(&managementrow, argv[3]);
+        printRow(&managementrow, 0);
+        printRow(&managementrow, 4013);
+        makeKanonymity(&managementrow, k);
+        printRow(&managementrow, 0);
+        printRow(&managementrow, 4013);
+        printAllRows(&managementrow);
+        writeToCSV (&managementrow, argv[4]);
+        freeAllRows(&managementrow);
     }
     else
     {
