@@ -1,4 +1,4 @@
-# 2019_09_28_kanonymity
+# 2019-09-28_kanonymity
 
 ## Program description:
 The k-Anonymity algorithm processes the data for publication in order to break the correct link to the sensitive data and thus make the entries indistinguishable. Thus, the data is anoymic and cannot be assigned to any person.
