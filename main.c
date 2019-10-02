@@ -6,6 +6,12 @@
 
 typedef struct management //STRUCT FOR MANAGE ALL ELEMENTS/ROWS
 {
+    char nameOfqi1[MAXSIZE]; //QUASI-IDENTIFIER (PLZ OR NUMBER, AGE)
+    char nameOfqi2[MAXSIZE]; //QUASI-IDENTIFIER (GENDER)
+    char nameOfqi3[MAXSIZE]; //QUASI-IDENTIFIER (DATE)
+    char nameOfsensitive1[MAXSIZE]; //SENSITIVE (REGION)
+    char nameOfsensitive2[MAXSIZE]; //SENSITIVE (JOB)
+    char nameOfsensitive3[MAXSIZE]; //SENSITIVE (MONEY)
     unsigned int elementcount; //ELEMENTCOUNTER IS THE NUMBER OF ALL ELEMENTS/ROWS IN STORAGE
     struct row* first; //POSITION OF THE FIRST ELEMENT/ROW IN STORAGE
 } management_struct;
@@ -33,12 +39,186 @@ int initManagementRow(management_struct *managementrow, FILE *debugfile)  //INIT
         return -1;
     }
 
+    if( (strncpy((managementrow->nameOfqi1), "", (MAXSIZE -1))) == NULL) //STORE VARIABLE IN STRUCT
+    {
+        printf("ERROR 4: NULLPOINTER in strncpy in addNewRow\n"); //ERROR MESSAGE
+        return -1;
+    }
+
+    if( (strncpy((managementrow->nameOfqi2), "", (MAXSIZE -1))) == NULL) //STORE VARIABLE IN STRUCT
+    {
+        printf("ERROR 4: NULLPOINTER in strncpy in addNewRow\n"); //ERROR MESSAGE
+        return -1;
+    }
+
+    if( (strncpy((managementrow->nameOfqi3), "", (MAXSIZE -1))) == NULL) //STORE VARIABLE IN STRUCT
+    {
+        printf("ERROR 4: NULLPOINTER in strncpy in addNewRow\n"); //ERROR MESSAGE
+        return -1;
+    }
+
+    if( (strncpy((managementrow->nameOfsensitive1), "", (MAXSIZE -1))) == NULL) //STORE VARIABLE IN STRUCT
+    {
+        printf("ERROR 4: NULLPOINTER in strncpy in addNewRow\n"); //ERROR MESSAGE
+        return -1;
+    }
+
+    if( (strncpy((managementrow->nameOfsensitive2), "", (MAXSIZE -1))) == NULL) //STORE VARIABLE IN STRUCT
+    {
+        printf("ERROR 4: NULLPOINTER in strncpy in addNewRow\n"); //ERROR MESSAGE
+        return -1;
+    }
+
+    if( (strncpy((managementrow->nameOfsensitive3), "", (MAXSIZE -1))) == NULL) //STORE VARIABLE IN STRUCT
+    {
+        printf("ERROR 4: NULLPOINTER in strncpy in addNewRow\n"); //ERROR MESSAGE
+        return -1;
+    }
+
     fprintf(debugfile, "Init Management Row.\n");  //WRITE TO DEBUGFILE
 
     managementrow->elementcount = 0; //SET ELEMENT COUNTER TO 0; BECAUSE NO DATA/ROWS ARE IN STORAGE
     managementrow->first =  NULL; //SET FIRST ELEMENT TO NULL; BECAUSE NO DATA/ROWS ARE IN STORAGE
 
     return 0;
+}
+
+int sortRows(management_struct *managementrow) //SORT THE ROWS BY BUBBLE SORT
+{
+    if(managementrow == NULL) {	//CHECK IF STRUCT IS NULL
+        printf("ERROR5: NULLPOINTER in managementrow.\n"); //ERROR MESSAGE
+        return -1;
+    }
+
+    struct row *currentrow; //STORAGE FOR CURRENT ELEMENT/ROW AND FOR INIT STORE THE FIRST ELEMENT OF MANAGEMENT STRUCT IN IT
+    int tempqi1; //VARIABLE FOR STORE TEMP RESULT FROM QI1
+    char tempqi2[MAXSIZE]; //VARIABLE FOR STORE TEMP RESULT FROM QI2
+    char tempqi3[MAXSIZE]; //VARIABLE FOR STORE TEMP RESULT FROM QI3
+    char tempsensitive1[MAXSIZE]; //VARIABLE FOR STORE TEMP RESULT FROM SENSITIVE1
+    char tempsensitive2[MAXSIZE]; //VARIABLE FOR STORE TEMP RESULT FROM SENSITIVE2
+    char tempsensitive3[MAXSIZE]; //VARIABLE FOR STORE TEMP RESULT FROM SENSITIVE3
+    int cyclecounter = 0; //COUNT CURRENT CYCLE OF SORTING
+    int check = 0; //CHECK IS A BOOLEAN FOR CHECK IF BUBBLE SORT IS FINISH
+
+    while (check == 0) //CHECK IF BUBBLE SORT IS FINISH
+    {
+        check = 1; //SET CHECK TO 1 FOR CHECK CHANGES
+        cyclecounter = 0; //SET COUNTER FOR CYCLE TO 0
+        currentrow = managementrow->first; //STORE FIRST ELEMENT/ROW IN CURRENTROW
+        while (currentrow->next != NULL) //CHECK IF NEXT ELEMENT/ROW AFTER THE CURRENT ELEMENT/ROW IS NULL
+        {
+            if(cyclecounter > managementrow->elementcount-1) //CHECK IF COUNTER IS GREATER THAN ELEMENTS/ROWS
+            {
+                break; //STOP THE LOOP
+            }
+
+            if (currentrow->qi1 > currentrow->next->qi1)
+            {
+                tempqi1 = currentrow->qi1; //STORE VALUE OF CURRENT ELEMENT/ROW IN TEMP VARIABLE
+                currentrow->qi1 = currentrow->next->qi1; //COPY VALUE OF NEXT ELEMENT/ROW IN CURRENT ELEMENT/ROW
+                currentrow->next->qi1 = tempqi1; //COPY VALUE OF TEMP TO NEXT ELEMENT/ROW
+
+                //CURRENT TO TEMP
+                if( (strncpy(tempqi2, currentrow->qi2, (MAXSIZE -1))) == NULL) //STORE VALUE OF CURRENT ELEMENT/ROW IN TEMP VARIABLE
+                {
+                    printf("ERROR 4: NULLPOINTER in strncpy in sortRows\n"); //ERROR MESSAGE
+                    return -1;
+                }
+                printf("tempqi2 = %s + currentrow->qi2 = %s\n", tempqi2, currentrow->qi2);
+
+                if( (strncpy(tempqi3, currentrow->qi3, (MAXSIZE -1))) == NULL) //STORE VALUE OF CURRENT ELEMENT/ROW IN TEMP VARIABLE
+                {
+                    printf("ERROR 4: NULLPOINTER in strncpy in sortRows\n"); //ERROR MESSAGE
+                    return -1;
+                }
+
+                if( (strncpy(tempsensitive1, currentrow->sensitive1, (MAXSIZE -1))) == NULL) //STORE VALUE OF CURRENT ELEMENT/ROW IN TEMP VARIABLE
+                {
+                    printf("ERROR 4: NULLPOINTER in strncpy in sortRows\n"); //ERROR MESSAGE
+                    return -1;
+                }
+
+                if( (strncpy(tempsensitive2, currentrow->sensitive2, (MAXSIZE -1))) == NULL) //STORE VALUE OF CURRENT ELEMENT/ROW IN TEMP VARIABLE
+                {
+                    printf("ERROR 4: NULLPOINTER in strncpy in sortRows\n"); //ERROR MESSAGE
+                    return -1;
+                }
+
+                if( (strncpy(tempsensitive3, currentrow->sensitive3, (MAXSIZE -1))) == NULL) //STORE VALUE OF CURRENT ELEMENT/ROW IN TEMP VARIABLE
+                {
+                    printf("ERROR 4: NULLPOINTER in strncpy in sortRows\n"); //ERROR MESSAGE
+                    return -1;
+                }
+                //CURRENTNEXT TO CURRENT
+                if( (strncpy(currentrow->qi2, currentrow->next->qi2, (MAXSIZE -1))) == NULL) //COPY VALUE OF NEXT ELEMENT/ROW IN CURRENT ELEMENT/ROW
+                {
+                    printf("ERROR 4: NULLPOINTER in strncpy in sortRows\n"); //ERROR MESSAGE
+                    return -1;
+                }
+                printf("currentrow->qi2 = %s + currentrow->next->qi2 = %s\n", currentrow->qi2, currentrow->next->qi2);
+
+                if( (strncpy(currentrow->qi3, currentrow->next->qi3, (MAXSIZE -1))) == NULL) //COPY VALUE OF NEXT ELEMENT/ROW IN CURRENT ELEMENT/ROW
+                {
+                    printf("ERROR 4: NULLPOINTER in strncpy in sortRows\n"); //ERROR MESSAGE
+                    return -1;
+                }
+
+                if( (strncpy(currentrow->sensitive1, currentrow->next->sensitive1, (MAXSIZE -1))) == NULL) //COPY VALUE OF NEXT ELEMENT/ROW IN CURRENT ELEMENT/ROW
+                {
+                    printf("ERROR 4: NULLPOINTER in strncpy in sortRows\n"); //ERROR MESSAGE
+                    return -1;
+                }
+
+                if( (strncpy(currentrow->sensitive2, currentrow->next->sensitive2, (MAXSIZE -1))) == NULL) //COPY VALUE OF NEXT ELEMENT/ROW IN CURRENT ELEMENT/ROW
+                {
+                    printf("ERROR 4: NULLPOINTER in strncpy in sortRows\n"); //ERROR MESSAGE
+                    return -1;
+                }
+
+                if( (strncpy(currentrow->sensitive3, currentrow->next->sensitive3, (MAXSIZE -1))) == NULL) //COPY VALUE OF NEXT ELEMENT/ROW IN CURRENT ELEMENT/ROW
+                {
+                    printf("ERROR 4: NULLPOINTER in strncpy in sortRows\n"); //ERROR MESSAGE
+                    return -1;
+                }
+                //TEMP TO CURRENTNEXT
+                if( (strncpy(currentrow->next->qi2, tempqi2, (MAXSIZE -1))) == NULL) //COPY VALUE OF TEMP TO NEXT ELEMENT/ROW
+                {
+                    printf("ERROR 4: NULLPOINTER in strncpy in sortRows\n"); //ERROR MESSAGE
+                    return -1;
+                }
+                printf("currentrow->next->qi2 = %s + tempqi2 = %s\n", currentrow->qi2, tempqi2);
+
+                if( (strncpy(currentrow->next->qi3, tempqi3, (MAXSIZE -1))) == NULL) //COPY VALUE OF TEMP TO NEXT ELEMENT/ROW
+                {
+                    printf("ERROR 4: NULLPOINTER in strncpy in sortRows\n"); //ERROR MESSAGE
+                    return -1;
+                }
+
+                if( (strncpy(currentrow->next->sensitive1, tempsensitive1, (MAXSIZE -1))) == NULL) //COPY VALUE OF TEMP TO NEXT ELEMENT/ROW
+                {
+                    printf("ERROR 4: NULLPOINTER in strncpy in sortRows\n"); //ERROR MESSAGE
+                    return -1;
+                }
+
+                if( (strncpy(currentrow->next->sensitive2, tempsensitive2, (MAXSIZE -1))) == NULL) //COPY VALUE OF TEMP TO NEXT ELEMENT/ROW
+                {
+                    printf("ERROR 4: NULLPOINTER in strncpy in sortRows\n"); //ERROR MESSAGE
+                    return -1;
+                }
+
+                if( (strncpy(currentrow->next->sensitive3, tempsensitive3, (MAXSIZE -1))) == NULL) //COPY VALUE OF TEMP TO NEXT ELEMENT/ROW
+                {
+                    printf("ERROR 4: NULLPOINTER in strncpy in sortRows\n"); //ERROR MESSAGE
+                    return -1;
+                }
+                check = 0; //SET CHECK TO 0 BECAUSE SOME CHANGES WERE MADE
+            }
+            cyclecounter++; //INCREASE COUNTER OF CYCLE
+            currentrow = currentrow->next; //GET NEXT ELEMENT/ROW
+        }
+    }
+
+    return 1;
 }
 
 int addNewRow(management_struct *managementrow, int qi1, char *qi2, char *qi3, char *sensitive1, char *sensitive2, char *sensitive3, FILE *debugfile) //ADD A NEW ELEMENT/ROW TO STORAGE
@@ -103,6 +283,7 @@ int addNewRow(management_struct *managementrow, int qi1, char *qi2, char *qi3, c
 
 int makeKanonymity(const management_struct *managementrow, int k, FILE *debugfile) //MAKE K-ANONYMITIY
 {
+    printf("make K-Anonymity\n");
     int i; //VARIABLE FOR FOR-LOOP
 
     if(managementrow == NULL) {	//CHECK IF STRUCT IS NULL
@@ -117,13 +298,18 @@ int makeKanonymity(const management_struct *managementrow, int k, FILE *debugfil
 
     row_struct* currentrow = managementrow->first; //STORE FIRST STRUCT IN THIS CURRENT STRUCT
 
+    if(currentrow == NULL) {	//CHECK IF STRUCT IS NULL
+        printf("ERROR5: NULLPOINTER in debugfile.\n"); //ERROR MESSAGE
+        return -1;
+    }
+
     printf("make k = %d:\n", k);
 
     fprintf(debugfile, "Make K-Anonymity.\n");  //WRITE TO DEBUGFILE
 
-    for(i = 0; i < managementrow->elementcount; i++) { //LOOP FOR CHECK ALL ROWS (ELEMENTS) OF THE DATAFILE -> ONE LOOP CYCLE IS ONE ROW
+    for(i = 1; i < managementrow->elementcount; i++) { //LOOP FOR CHECK ALL ROWS (ELEMENTS) OF THE DATAFILE -> ONE LOOP CYCLE IS ONE ROW
         //QUASI-IDENTIFIER QI1 AGE
-        switch(currentrow->qi1) { //CHECK NUMBER
+        switch(currentrow->qi1) { //CHECK NUMBER  //TODO UMBAUEN AUF IF else mit + vorher checken, ob is integer oder string
             case 1:
             case 2:
             case 3:
@@ -311,7 +497,7 @@ int printRow(const management_struct *managementrow, int number, FILE *debugfile
         fprintf(debugfile, "Sorry, no row available.\n");  //WRITE TO DEBUGFILE
     }
 
-    for(i = 0; i < managementrow->elementcount; i++) {  //GET ALL ELEMENTS/ROWS
+    for(i = 1; i < managementrow->elementcount; i++) {  //GET ALL ELEMENTS/ROWS
 
         if(i == number) //PRINT OUT DATA OF CURRENT ELEMENT/ROW
         {
@@ -334,7 +520,7 @@ int printAllRows(const management_struct *managementrow, FILE *debugfile) //PRIN
 
     fprintf(debugfile, "Print All Rows\n"); //WRITE TO DEBUGFILE
 
-    for(i = 0; i < managementrow->elementcount; i++) { //GET ALL ELEMENTS/ROWS
+    for(i = 1; i < managementrow->elementcount; i++) { //GET ALL ELEMENTS/ROWS
 
         fprintf(debugfile, "Print row with number[%d]: %d, %s, %s, %s, %s, %s", i, currentrow->qi1, currentrow->qi2, currentrow->qi3, currentrow->sensitive1, currentrow->sensitive2, currentrow->sensitive3); // //WRITE TO DEBUGFILE THE DATA OF CURRENT ELEMENT/ROW
         currentrow = currentrow->next; //GET NEXT ELEMENT/ROW AND STORE IT IN CURRENT STRUCT
@@ -367,6 +553,8 @@ int readFromCSV (management_struct *managementrow, char *filename, FILE *debugfi
     char *store[MAXSIZE] = {NULL}; //CREATE ARRAY FOR STORE EVERY PART OF THE ROW
     char *token = 0; //POINTER FOR CURRENT POSITION IN ROW
 
+
+
     while (fgets(buffer, sizeof(buffer), inputfile)) //READS DATA FROM INPUTFILE INTRO THE BUFFER
     {
         int i = 0; //VARIABLE FOR POSITION IN ARRAY
@@ -378,7 +566,56 @@ int readFromCSV (management_struct *managementrow, char *filename, FILE *debugfi
             token = strtok(NULL, ","); //STORE NEXT POSITION IN TOKEN - THE SEPARATOR IS THE COMMA
             i++; //INCREASE COUNTER FOR NEXT POSITION IN ARRAY
         }
-        addNewRow(managementrow, atoi(store[4]), store[3], store[7], store[5], store[6], store[8], debugfile); //CALL FUNCTION FOR ADD A NEW ROW IN STORAGE
+        if (managementrow->elementcount == 0)
+        {
+            printf("mangement schreibt spalten namen\n");
+
+            if( (strncpy((managementrow->nameOfqi1), store[4], (MAXSIZE -1))) == NULL) //STORE VARIABLE IN STRUCT
+            {
+                printf("ERROR 4: NULLPOINTER in strncpy in addNewRow\n"); //ERROR MESSAGE
+                return -1;
+            }
+
+
+            if( (strncpy((managementrow->nameOfqi2), store[3], (MAXSIZE -1))) == NULL) //STORE VARIABLE IN STRUCT
+            {
+                printf("ERROR 4: NULLPOINTER in strncpy in addNewRow\n"); //ERROR MESSAGE
+                return -1;
+            }
+
+            if( (strncpy((managementrow->nameOfqi3), store[7], (MAXSIZE -1))) == NULL) //STORE VARIABLE IN STRUCT
+            {
+                printf("ERROR 4: NULLPOINTER in strncpy in addNewRow\n"); //ERROR MESSAGE
+                return -1;
+            }
+
+            if( (strncpy((managementrow->nameOfsensitive1), store[5], (MAXSIZE -1))) == NULL) //STORE VARIABLE IN STRUCT
+            {
+                printf("ERROR 4: NULLPOINTER in strncpy in addNewRow\n"); //ERROR MESSAGE
+                return -1;
+            }
+
+            if( (strncpy((managementrow->nameOfsensitive2), store[6], (MAXSIZE -1))) == NULL) //STORE VARIABLE IN STRUCT
+            {
+                printf("ERROR 4: NULLPOINTER in strncpy in addNewRow\n"); //ERROR MESSAGE
+                return -1;
+            }
+
+            if( (strncpy((managementrow->nameOfsensitive3), store[8], (MAXSIZE -1))) == NULL) //STORE VARIABLE IN STRUCT
+            {
+                printf("ERROR 4: NULLPOINTER in strncpy in addNewRow\n"); //ERROR MESSAGE
+                return -1;
+            }
+
+            managementrow->elementcount++;
+        }
+        else
+        {
+            printf("add\n");
+            addNewRow(managementrow, atoi(store[4]), store[3], store[7], store[5], store[6], store[8], debugfile); //CALL FUNCTION FOR ADD A NEW ROW IN STORAGE
+        }
+
+
     }
 
     fclose(inputfile); //CLOSE INPUTFILE
@@ -409,13 +646,13 @@ int writeToCSV (management_struct *managementrow, char *filename, FILE *debugfil
 
     int i; //VARIABLE FOR FOR-LOOP
     row_struct* currentrow = managementrow->first; //STORAGE FOR CURRENT ELEMENT/ROW AND FOR INIT STORE THE FIRST ELEMENT OF MANAGEMENT STRUCT IN IT
-
-    fprintf(outputfile, "Age, Gender, Date, Region, Job Classification, Balance\n");  //WRITE COLUMN NAMES TO OUTPUTFILE
-    for(i = 0; i < managementrow->elementcount; i++) {  //GET ALL ELEMENTS/ROWS
+    printf("elementcounter %d\n", managementrow->elementcount);
+   fprintf(outputfile, "%s, %s, %s, %s, %s, %s", managementrow->nameOfqi1, managementrow->nameOfqi2, managementrow->nameOfqi3, managementrow->nameOfsensitive1, managementrow->nameOfsensitive2, managementrow->nameOfsensitive3);  //WRITE COLUMN NAMES TO OUTPUTFILE
+    for(i = 1; i < (managementrow->elementcount); i++) {  //GET ALL ELEMENTS/ROWS
         fprintf(outputfile, "%d, %s, %s, %s, %s, %s", currentrow->qi1, currentrow->qi2, currentrow->qi3, currentrow->sensitive1, currentrow->sensitive2, currentrow->sensitive3); //WRITE ROW INTO OUTPUTFILE (ROW BY ROW)
         currentrow = currentrow->next; //GET NEXT ELEMENT/ROW AND STORE IT IN CURRENT STRUCT
     }
-
+    printf("Finished\n");
     fclose(outputfile); //CLOSE OUTPUTFILE
 
     return 1;
@@ -449,6 +686,19 @@ int freeAllRows(management_struct *managementrow, FILE *debugfile) //FREE MEMORY
     return 1;
 }
 
+void printTests(management_struct *managementrow) //PRINT OUT ALL ROWS
+{
+    int i;
+
+    row_struct* currentrow = managementrow->first; //STORAGE FOR CURRENT ELEMENT/ROW AND FOR INIT STORE THE FIRST ELEMENT OF MANAGEMENT STRUCT IN IT
+
+        for(i = 1; i < managementrow->elementcount; i++) { //GET ALL ELEMENTS/ROWS
+
+            printf("ELEMENT [%d]: %d, %s, %s, %s, %s, %s", i, currentrow->qi1, currentrow->qi2, currentrow->qi3, currentrow->sensitive1, currentrow->sensitive2, currentrow->sensitive3); //PRINT OUT DATA OF CURRENT ELEMENT/ROW
+            currentrow = currentrow->next; //GET NEXT ELEMENT/ROW AND STORE IT IN CURRENT STRUCT
+        }
+    }
+
 int main(int argc, char **argv)
 {
     if(argc == 0) //CHECK IF ARGC IS NULL
@@ -481,31 +731,25 @@ int main(int argc, char **argv)
         fprintf(debugfile, "Command is anonymize:\n");  //WRITE TO DEBUGFILE
         management_struct managementrow; //STORAGE FOR MANAGEMENT OF ALL ELEMENTS/ROWS
         initManagementRow(&managementrow, debugfile); //CALL FUNCTION TO INIT MANAGEMENT STRUCT
+
         readFromCSV(&managementrow, argv[3], debugfile);
-        printRow(&managementrow, 0, debugfile);
-        printRow(&managementrow, 4013, debugfile);
-        makeKanonymity(&managementrow, k, debugfile);
-        printRow(&managementrow, 0, debugfile);
-        printRow(&managementrow, 4013, debugfile);
-        // printAllRows(&managementrow, debugfile);
+      makeKanonymity(&managementrow, k, debugfile);
+        printTests(&managementrow);
+        sortRows(&managementrow);
+        printTests(&managementrow);
         writeToCSV (&managementrow, argv[4], debugfile);
         freeAllRows(&managementrow, debugfile);
         fclose(debugfile); //CLOSE DEBUGFILE
     }
+    else if((argc == 3) && (strcmp(argv[1], "–findk") == 0))
+    {
+
+        return k;
+    }
     else
     {
-        if((argc == 3) && (strcmp(argv[1], "–findk") == 0)) /* –findk inputFile.csv */
-        {
-            printf("bla");
-
-
-            return k;
-        }
-        else
-        {
-            printf("ERROR3: The number of arguments is wrong.\n"); //ERROR MESSAGE
-            exit(1);
-        }
+        printf("ERROR3: The number of arguments is wrong.\n"); //ERROR MESSAGE
+        exit(1);
     }
 
     return 0 ;
