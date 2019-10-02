@@ -124,7 +124,6 @@ int sortRows(management_struct *managementrow) //SORT THE ROWS BY BUBBLE SORT
                     printf("ERROR 4: NULLPOINTER in strncpy in sortRows\n"); //ERROR MESSAGE
                     return -1;
                 }
-                printf("tempqi2 = %s + currentrow->qi2 = %s\n", tempqi2, currentrow->qi2);
 
                 if( (strncpy(tempqi3, currentrow->qi3, (MAXSIZE -1))) == NULL) //STORE VALUE OF CURRENT ELEMENT/ROW IN TEMP VARIABLE
                 {
@@ -155,7 +154,6 @@ int sortRows(management_struct *managementrow) //SORT THE ROWS BY BUBBLE SORT
                     printf("ERROR 4: NULLPOINTER in strncpy in sortRows\n"); //ERROR MESSAGE
                     return -1;
                 }
-                printf("currentrow->qi2 = %s + currentrow->next->qi2 = %s\n", currentrow->qi2, currentrow->next->qi2);
 
                 if( (strncpy(currentrow->qi3, currentrow->next->qi3, (MAXSIZE -1))) == NULL) //COPY VALUE OF NEXT ELEMENT/ROW IN CURRENT ELEMENT/ROW
                 {
@@ -186,7 +184,6 @@ int sortRows(management_struct *managementrow) //SORT THE ROWS BY BUBBLE SORT
                     printf("ERROR 4: NULLPOINTER in strncpy in sortRows\n"); //ERROR MESSAGE
                     return -1;
                 }
-                printf("currentrow->next->qi2 = %s + tempqi2 = %s\n", currentrow->qi2, tempqi2);
 
                 if( (strncpy(currentrow->next->qi3, tempqi3, (MAXSIZE -1))) == NULL) //COPY VALUE OF TEMP TO NEXT ELEMENT/ROW
                 {
@@ -283,7 +280,6 @@ int addNewRow(management_struct *managementrow, int qi1, char *qi2, char *qi3, c
 
 int makeKanonymity(const management_struct *managementrow, int k, FILE *debugfile) //MAKE K-ANONYMITIY
 {
-    printf("make K-Anonymity\n");
     int i; //VARIABLE FOR FOR-LOOP
 
     if(managementrow == NULL) {	//CHECK IF STRUCT IS NULL
@@ -302,8 +298,6 @@ int makeKanonymity(const management_struct *managementrow, int k, FILE *debugfil
         printf("ERROR5: NULLPOINTER in debugfile.\n"); //ERROR MESSAGE
         return -1;
     }
-
-    printf("make k = %d:\n", k);
 
     fprintf(debugfile, "Make K-Anonymity.\n");  //WRITE TO DEBUGFILE
 
@@ -568,8 +562,6 @@ int readFromCSV (management_struct *managementrow, char *filename, FILE *debugfi
         }
         if (managementrow->elementcount == 0)
         {
-            printf("mangement schreibt spalten namen\n");
-
             if( (strncpy((managementrow->nameOfqi1), store[4], (MAXSIZE -1))) == NULL) //STORE VARIABLE IN STRUCT
             {
                 printf("ERROR 4: NULLPOINTER in strncpy in addNewRow\n"); //ERROR MESSAGE
@@ -611,7 +603,6 @@ int readFromCSV (management_struct *managementrow, char *filename, FILE *debugfi
         }
         else
         {
-            printf("add\n");
             addNewRow(managementrow, atoi(store[4]), store[3], store[7], store[5], store[6], store[8], debugfile); //CALL FUNCTION FOR ADD A NEW ROW IN STORAGE
         }
 
@@ -646,7 +637,6 @@ int writeToCSV (management_struct *managementrow, char *filename, FILE *debugfil
 
     int i; //VARIABLE FOR FOR-LOOP
     row_struct* currentrow = managementrow->first; //STORAGE FOR CURRENT ELEMENT/ROW AND FOR INIT STORE THE FIRST ELEMENT OF MANAGEMENT STRUCT IN IT
-    printf("elementcounter %d\n", managementrow->elementcount);
    fprintf(outputfile, "%s, %s, %s, %s, %s, %s", managementrow->nameOfqi1, managementrow->nameOfqi2, managementrow->nameOfqi3, managementrow->nameOfsensitive1, managementrow->nameOfsensitive2, managementrow->nameOfsensitive3);  //WRITE COLUMN NAMES TO OUTPUTFILE
     for(i = 1; i < (managementrow->elementcount); i++) {  //GET ALL ELEMENTS/ROWS
         fprintf(outputfile, "%d, %s, %s, %s, %s, %s", currentrow->qi1, currentrow->qi2, currentrow->qi3, currentrow->sensitive1, currentrow->sensitive2, currentrow->sensitive3); //WRITE ROW INTO OUTPUTFILE (ROW BY ROW)
@@ -711,7 +701,7 @@ int main(int argc, char **argv)
     long convertk =  strtol(argv[2], &ptr, 10); //CONVERT TYPE FROM ARGV FROM STRING TO LONG
     int k = convertk; //CONVERT TYPE LONG TO INT
 
-    if((argc == 6) && (strcmp(argv[1], "–anonymize") == 0)) /* –anonymize 5 inputFile.csv outputFile.csv [debugfile.txt] */
+    if((argc == 6) && (strcmp(argv[1], "–anonymize") == 0)) // –anonymize 5 inputFile.csv outputFile.csv [debugfile.txt]
     {
         FILE *debugfile = fopen(argv[5],"w"); //CREATE FILE AND OPEN FILE WITH WRITE MODE
 
@@ -731,19 +721,16 @@ int main(int argc, char **argv)
         fprintf(debugfile, "Command is anonymize:\n");  //WRITE TO DEBUGFILE
         management_struct managementrow; //STORAGE FOR MANAGEMENT OF ALL ELEMENTS/ROWS
         initManagementRow(&managementrow, debugfile); //CALL FUNCTION TO INIT MANAGEMENT STRUCT
-
-        readFromCSV(&managementrow, argv[3], debugfile);
-      makeKanonymity(&managementrow, k, debugfile);
-        printTests(&managementrow);
-        sortRows(&managementrow);
-        printTests(&managementrow);
-        writeToCSV (&managementrow, argv[4], debugfile);
-        freeAllRows(&managementrow, debugfile);
+        readFromCSV(&managementrow, argv[3], debugfile); //CALL FUNCTION TO READ FROM CSV FILE
+        makeKanonymity(&managementrow, k, debugfile); //CALL FUNCTION TO MAKE K-ANONYMITY
+        sortRows(&managementrow); //CALL FUNCTION TO SORT ALL ELEMENTS/ROWS
+        printTests(&managementrow); //CALL FUNCTION TO PRINT ELEMENTS/ROWS FOR TEST
+        writeToCSV (&managementrow, argv[4], debugfile); //CALL FUNCTION TO WRITE TO CSV FILE
+        freeAllRows(&managementrow, debugfile); //CALL FUNCTION TO DELETE ALL ELEMENTS/ROWS
         fclose(debugfile); //CLOSE DEBUGFILE
     }
-    else if((argc == 3) && (strcmp(argv[1], "–findk") == 0))
+    else if((argc == 3) && (strcmp(argv[1], "–findk") == 0)) //-findk inputFile.csv
     {
-
         return k;
     }
     else
